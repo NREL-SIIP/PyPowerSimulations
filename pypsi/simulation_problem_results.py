@@ -1,13 +1,14 @@
 from pypsi.base import convert_to_pandas
 from julia import Pandas, DataFrames
+from julia import Main
 from julia import PowerSimulations as PSI
 
 class SimulationProblemResults:
-    def __init__(self, path, execution, problem, ignore_status=False):
+    def __init__(self, path, problem, execution=1, ignore_status=False):
         self.path = path
         self.execution = execution
         self.problem_name = problem
-        self.jl_SimulationResults = PSI.SimulationResults(path)
+        self.jl_SimulationResults = PSI.SimulationResults(path, execution, ignore_status=ignore_status)
         self.jl_SimulationProblemResults = PSI.get_decision_problem_results(self.jl_SimulationResults, self.problem_name)
 
     def get_model_name(self):
@@ -67,53 +68,55 @@ class SimulationProblemResults:
         return
         
     # TODO: test if kwargs are passed correctly
-    def read_realized_variables(self, **kwargs):
-        return convert_to_pandas(PSI.read_realized_variables(self.jl_SimulationProblemResults, **kwargs))        
+    def read_realized_variables(self, variables=Main.nothing, start_time=Main.nothing, len=Main.nothing):
+        if variables is Main.nothing:
+            return convert_to_pandas(PSI.read_realized_variables(self.jl_SimulationProblemResults, start_time=start_time, len=len))        
+        else:
+            return convert_to_pandas(PSI.read_realized_variables(self.jl_SimulationProblemResults, variables, start_time=start_time, len=len)) 
+        
 
-    def read_realized_variables(self, variables, **kwargs):
-        return convert_to_pandas(PSI.read_realized_variables(self.jl_SimulationProblemResults, variables,  **kwargs))
+    def read_realized_variable(self, variable, start_time=Main.nothing, len=Main.nothing):
+        return convert_to_pandas(PSI.read_realized_variable(self.jl_SimulationProblemResults, variable,  start_time=start_time, len=len))
+     
 
-    def read_realized_variable(self, variable, **kwargs):
-        return convert_to_pandas(PSI.read_realized_variable(self.jl_SimulationProblemResults, variable,  **kwargs))
+    def read_realized_aux_variables(self, aux_variables=Main.nothing, start_time=Main.nothing, len=Main.nothing):
+        if aux_variables is Main.nothing:
+            return convert_to_pandas(PSI.read_realized_aux_variables(self.jl_SimulationProblemResults, start_time=start_time, len=len))
+        else:
+            return convert_to_pandas(PSI.read_realized_aux_variables(self.jl_SimulationProblemResults, aux_variables, start_time=start_time, len=len)) 
+        
 
-    def read_realized_aux_variables(self, **kwargs):
-        return convert_to_pandas(PSI.read_realized_aux_variables(self.jl_SimulationProblemResults, **kwargs))        
+    def read_realized_aux_variable(self, aux_variable, start_time=Main.nothing, len=Main.nothing):
+        return convert_to_pandas(PSI.read_realized_aux_variable(self.jl_SimulationProblemResults, aux_variable,  start_time=Main.nothing, len=Main.nothing))
 
-    def read_realized_aux_variables(self, aux_variables, **kwargs):
-        return convert_to_pandas(PSI.read_realized_aux_variables(self.jl_SimulationProblemResults, aux_variables,  **kwargs))
+    def read_realized_parameters(self, parameters=Main.nothing, start_time=Main.nothing, len=Main.nothing):
+        if parameters is Main.nothing:
+            return convert_to_pandas(PSI.read_realized_parameters(self.jl_SimulationProblemResults, start_time=start_time, len=len))
+        else:
+            return convert_to_pandas(PSI.read_realized_parameters(self.jl_SimulationProblemResults, parameters, start_time=start_time, len=len)) 
+        
 
-    def read_realized_aux_variable(self, aux_variable, **kwargs):
-        return convert_to_pandas(PSI.read_realized_aux_variable(self.jl_SimulationProblemResults, aux_variable,  **kwargs))
+    def read_realized_aux_variable(self, parameter=Main.nothing, start_time=Main.nothing, len=Main.nothing):
+        return convert_to_pandas(PSI.read_realized_aux_variable(self.jl_SimulationProblemResults, parameter,  start_time=start_time, len=len))
 
-    def read_realized_parameters(self, **kwargs):
-        return PSI.read_realized_parameters(self.jl_SimulationProblemResults, **kwargs)        
+    def read_realized_duals(self, duals=Main.nothing, start_time=Main.nothing, len=Main.nothing):
+        if duals is Main.nothing:
+            return convert_to_pandas(PSI.read_realized_duals(self.jl_SimulationProblemResults, start_time=start_time, len=len))
+        else:
+            return convert_to_pandas(PSI.read_realized_duals(self.jl_SimulationProblemResults, duals, start_time=start_time, len=len)) 
+        
 
-    def read_realized_parameters(self, parameters, **kwargs):
-        return convert_to_pandas(PSI.read_realized_parameters(self.jl_SimulationProblemResults, parameters,  **kwargs))
+    def read_realized_dual(self, dual=Main.nothing, start_time=Main.nothing, len=Main.nothing):
+        return convert_to_pandas(PSI.read_realized_dual(self.jl_SimulationProblemResults, dual,  start_time=start_time, len=len))
 
-    def read_realized_aux_variable(self, parameter, **kwargs):
-        return convert_to_pandas(PSI.read_realized_aux_variable(self.jl_SimulationProblemResults, parameter,  **kwargs))
+    def read_realized_expressions(self, expressions=Main.nothing, start_time=Main.nothing, len=Main.nothing):
+        if expressions is Main.nothing:
+            return convert_to_pandas(PSI.read_realized_expressions(self.jl_SimulationProblemResults, start_time=start_time, len=len))
+        else:
+            return convert_to_pandas(PSI.read_realized_expressions(self.jl_SimulationProblemResults, expressions, start_time=start_time, len=len)) 
 
-    def read_realized_duals(self, **kwargs):
-        return convert_to_pandas(PSI.read_realized_duals(self.jl_SimulationProblemResults, **kwargs))        
-
-    def read_realized_duals(self, duals, **kwargs):
-        return convert_to_pandas(PSI.read_realized_duals(self.jl_SimulationProblemResults, duals,  **kwargs))
-
-    def read_realized_dual(self, dual, **kwargs):
-        return convert_to_pandas(PSI.read_realized_dual(self.jl_SimulationProblemResults, dual,  **kwargs))
-
-    def read_realized_expressions(self, **kwargs):
-        return convert_to_pandas(PSI.read_realized_expressions(self.jl_SimulationProblemResults, **kwargs))
-
-    def read_realized_expressions(self, expressions, **kwargs):
-        return convert_to_pandas(PSI.read_realized_expressions(self.jl_SimulationProblemResults, expressions,  **kwargs))
-
-    def read_realized_expression(self, expression, **kwargs):
-        return convert_to_pandas(PSI.read_realized_expression(self.jl_SimulationProblemResults, expression,  **kwargs))
-
-    def export_realized_results(self,):
-        return PSI.export_realized_results(self.jl_SimulationProblemResults)
+    def read_realized_expression(self, expression=Main.nothing, start_time=Main.nothing, len=Main.nothing):
+        return convert_to_pandas(PSI.read_realized_expression(self.jl_SimulationProblemResults, expression,  start_time=start_time, len=len))
 
     def export_realized_results(self, save_path):
         return PSI.export_realized_results(self.jl_SimulationProblemResults, save_path)
